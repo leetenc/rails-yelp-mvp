@@ -1,11 +1,11 @@
 class RestaurantsController < ApplicationController
- before_action :find_restaurant, only: [:show, :edit, :update, :destroy]
+  before_action :find_restaurant, only: [:show, :edit, :update, :destroy]
   def index
     @restaurants = Restaurant.all
   end
 
   def show
-    @completed = @restaurant.completed ? 'Completed' : 'To be done'
+    @review = Review.new
   end
 
   def new
@@ -14,26 +14,32 @@ class RestaurantsController < ApplicationController
 
   def create
     @restaurant = Restaurant.new(restaurant_params)
-    @restaurant.save
-    redirect_to restaurant_path(@restaurant)
+    if @restaurant.save
+      redirect_to restaurants_path(@restaurant)
+    else
+      render :new
+    end
   end
 
   def edit; end
 
   def update
-    @restaurant.update(restaurant_params)
-    redirect_to restaurant_path(@restaurant)
+    if @restaurant.update(restaurant_params)
+      redirect_to restaurant_path(@restaurant)
+    else
+      render :edit
+    end
   end
 
   def destroy
     @restaurant.destroy
-    redirect_to restaurant_path
+    redirect_to restaurants_path
   end
 
   private
 
   def restaurant_params
-    params.require(:restaurant).permit(:title, :details, :completed)
+    params.require(:restaurant).permit(:name, :address, :phone_number, :category)
   end
 
   def find_restaurant
